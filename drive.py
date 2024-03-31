@@ -1,31 +1,31 @@
-from donkeycar.parts.actuator import PCA9685
-from time import sleep
+from donkeycar.parts.actuator import PulseController
+from donkeycar.parts import pins
 
-'''
-    -
-    -
-    - 
-'''
-throttle = PCA9685(0, address=64, busnum=None, frequency=60)
-steering = PCA9685(1, address=64, busnum=None, frequency=60)
-speed = 395
-angle_straight = 360
-angle_left = 90
-angle_right = 450
-cnt = 1
+pwm_pin = 'PCA9685.1:40.0'
+pwmFreq = 60
+
+try:
+    pwm_pin = pins.pwm_pin_by_id(pwm_pin)
+except ValueError as e:
+    print(e)
+    print("See pins.py for a description of pin specification strings.")
+    exit(-1)
+print(f'init pin {pwm_pin}')
+freq = int(pwmFreq)
+print(f"Using PWM freq: {freq}")
+car = PulseController(pwm_pin)
+input_prompt = "Enter a PWM setting to test ('q' for quit) (0-1500): "
+print()
+
 while True:
-    print('Running............')
-    '''
-        Revers: 371(max)
-        Forward: 395(min)
-    '''
-   #Go straight
-    throttle.run(speed)
-    if cnt == 4:
-        steering.run(angle_right)
-        sleep(1)
-    steering.run(angle_straight)
-    sleep(1)
-    cnt +=1
-
-   
+    try:
+        val = input(input_prompt)
+        if val == 'q' or val == 'Q':
+            break
+        pmw = int(val)
+        car.run(pmw)
+    except KeyboardInterrupt:
+        print("\nKeyboardInterrupt received, exit.")
+        break
+    except Exception as ex:
+        print(f"Oops, {ex}")
