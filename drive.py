@@ -1,10 +1,10 @@
 from donkeycar.parts.actuator import PulseController
 from donkeycar.parts import pins
 import time
-from donkeycar.parts.actuator import PCA9685
 from time import sleep
 import pygame
 import sys
+import cv2
   
 # Define the background colour 
 # using RGB color coding. 
@@ -44,27 +44,36 @@ angle_left = 90
 angle_right = 450
 
 car.run(10)
+angle = 360
 time.sleep(1)
 while running:
         events = pygame.event.get()
         for event in events:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_LEFT:
-                    pwm_steer.run(angle_left)
+                    angle -= 10
+                    if angle < 290:
+                        angle = 290
+                    steer.run(angle)
+                    print(angle)
                 if event.key == pygame.K_RIGHT:
-                    pwm_steer.run(angle_right)
+                    angle += 10
+                    if angle > 450:
+                        angle = 450
+                    steer.run(angle)
+                    print(angle)
                 if event.key == pygame.K_UP:
-                    pwm_pin.run(speed)
+                    car.run(speed)
                 if event.key == pygame.K_DOWN:
-                    print("Down down")
+                    car.run(0)
+                    car.run(10)
+                   
             if event.type == pygame.QUIT:
                 running = False
                 print("Exiting")
                 break
-            if event.type == pygame.KEYUP:
-                pwm_steer.run(angle_straight)
 car.run(0)
-steer.run(360)
+
 
 pygame.display.quit()
 pygame.quit()
